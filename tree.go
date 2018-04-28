@@ -78,17 +78,13 @@ func (tree *Tree) build() error {
 			right := level[i+1]
 
 			tree.config.hasher.Reset()
-
-			b := make([]byte, len(left.Bytes())+len(right.Bytes()))
-			copy(b[0:len(left.Bytes())], left.Bytes()[:])
-			copy(b[len(left.Bytes()):len(b)], right.Bytes()[:])
-
+			b := concBytes(left.Bytes(), right.Bytes())
 			if _, err := conf.hasher.Write(b); err != nil {
 				return err
 			}
-			hashBytes := conf.hasher.Sum(nil)
+			b = conf.hasher.Sum(nil)
 
-			tree.levels[nextDepth][i/2] = newNode(hashBytes, left, right)
+			tree.levels[nextDepth][i/2] = newNode(b, left, right)
 		}
 
 		tree.nodes = append(tree.nodes, tree.levels[nextDepth]...)
