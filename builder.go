@@ -11,22 +11,22 @@ import (
 const (
 	DepthMin    = 1
 	DepthMax    = 16
-	LeafSizeMin = 1  // bytes
-	LeafSizeMax = 64 // bytes
+	HashSizeMin = 1  // bytes
+	HashSizeMax = 64 // bytes
 )
 
 var (
 	ErrTooSmallDepth    = fmt.Errorf("depth must be %d or more", DepthMin)
 	ErrTooLargeDepth    = fmt.Errorf("depth must be %d or less", DepthMax)
-	ErrTooSmallLeafSize = fmt.Errorf("leaf size must be %d or more", LeafSizeMin)
-	ErrTooLargeLeafSize = fmt.Errorf("leaf size must be %d or less", LeafSizeMax)
+	ErrTooSmallHashSize = fmt.Errorf("leaf size must be %d or more", HashSizeMin)
+	ErrTooLargeHashSize = fmt.Errorf("leaf size must be %d or less", HashSizeMax)
 	ErrTooManyLeaves    = errors.New("number of leaves exceeds upper limit")
 )
 
 type TreeBuilder struct {
 	hasher    hash.Hash
 	depth     int
-	leafSize  int
+	hashSize  int
 	leavesNum int
 	nodesNum  int
 }
@@ -34,23 +34,23 @@ type TreeBuilder struct {
 var DefaultTreeBuilder = &TreeBuilder{
 	hasher:    sha256.New(),
 	depth:     16,
-	leafSize:  32,
+	hashSize:  32,
 	leavesNum: 65536,
 	nodesNum:  131071,
 }
 
-func NewTreeBuilder(hasher hash.Hash, depth int, leafSize int) (*TreeBuilder, error) {
+func NewTreeBuilder(hasher hash.Hash, depth int, hashSize int) (*TreeBuilder, error) {
 	if depth < DepthMin {
 		return nil, ErrTooSmallDepth
 	}
 	if depth > DepthMax {
 		return nil, ErrTooLargeDepth
 	}
-	if leafSize < LeafSizeMin {
-		return nil, ErrTooSmallLeafSize
+	if hashSize < HashSizeMin {
+		return nil, ErrTooSmallHashSize
 	}
-	if leafSize > LeafSizeMax {
-		return nil, ErrTooLargeLeafSize
+	if hashSize > HashSizeMax {
+		return nil, ErrTooLargeHashSize
 	}
 
 	leavesNum := int(math.Exp2(float64(depth)))
@@ -63,7 +63,7 @@ func NewTreeBuilder(hasher hash.Hash, depth int, leafSize int) (*TreeBuilder, er
 	return &TreeBuilder{
 		hasher:    hasher,
 		depth:     depth,
-		leafSize:  leafSize,
+		hashSize:  hashSize,
 		leavesNum: leavesNum,
 		nodesNum:  nodesNum,
 	}, nil
@@ -95,7 +95,7 @@ func (builder *TreeBuilder) Build(leaves [][]byte, hashed bool) (*Tree, error) {
 	}
 
 	for i := leavesNum; i < builder.leavesNum; i++ {
-		node := NewNode(make([]byte, builder.leafSize, builder.leafSize), nil, nil)
+		node := NewNode(make([]byte, builder.hashSize, builder.hashSize), nil, nil)
 		nodes[i] = node
 		bottomLevel[i] = node
 	}
