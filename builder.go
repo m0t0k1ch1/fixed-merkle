@@ -103,10 +103,7 @@ func (builder *TreeBuilder) Build(leaves [][]byte, hashed bool) (*Tree, error) {
 	levels := make([][]*Node, builder.depth+1)
 	levels[builder.depth] = bottomLevel
 
-	tree := &Tree{
-		Nodes:  nodes,
-		Levels: levels,
-	}
+	tree := NewTree(nodes, levels)
 
 	for depth := builder.depth; depth > 0; depth-- {
 		builder.buildNextLevel(tree, depth)

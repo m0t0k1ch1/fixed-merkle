@@ -14,21 +14,33 @@ type Tree struct {
 	Levels [][]*Node
 }
 
+func NewTree(nodes []*Node, levels [][]*Node) *Tree {
+	return &Tree{
+		Nodes:  nodes,
+		Levels: levels,
+	}
+}
+
+func (tree *Tree) Depth() int {
+	return len(tree.Levels) - 1
+}
+
+func (tree *Tree) LeavesNum() int {
+	return len(tree.Levels[tree.Depth()])
+}
+
 func (tree *Tree) Root() *Node {
 	return tree.Levels[0][0]
 }
 
 func (tree *Tree) CreateMembershipProof(index int) ([]byte, error) {
-	depth := len(tree.Levels) - 1
-	leavesNum := len(tree.Levels[depth])
-
-	if index < 0 || leavesNum <= index {
+	if index < 0 || tree.LeavesNum() <= index {
 		return nil, ErrLeafIndexOutOfRange
 	}
 
 	buf := bytes.NewBuffer(nil)
 
-	for i := depth; i > 0; i-- {
+	for i := tree.Depth(); i > 0; i-- {
 		var siblingIndex int
 		if index%2 == 0 {
 			siblingIndex = index + 1
