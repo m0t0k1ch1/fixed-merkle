@@ -8,7 +8,7 @@ type Node struct {
 	Right *Node
 }
 
-func NewNode(hashBytes []byte, left, right *Node) *Node {
+func newNode(hashBytes []byte, left, right *Node) *Node {
 	return &Node{
 		b:     hashBytes,
 		Left:  left,
