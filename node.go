@@ -3,19 +3,23 @@ package merkle
 import "encoding/hex"
 
 type Node struct {
-	HashBytes []byte
-	Left      *Node
-	Right     *Node
+	b     []byte
+	Left  *Node
+	Right *Node
 }
 
 func NewNode(hashBytes []byte, left, right *Node) *Node {
 	return &Node{
-		HashBytes: hashBytes,
-		Left:      left,
-		Right:     right,
+		b:     hashBytes,
+		Left:  left,
+		Right: right,
 	}
 }
 
+func (node *Node) Bytes() []byte {
+	return node.b
+}
+
 func (node *Node) Hex() string {
-	return hex.EncodeToString(node.HashBytes)
+	return hex.EncodeToString(node.b)
 }

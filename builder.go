@@ -127,9 +127,9 @@ func (builder *TreeBuilder) buildNextLevel(tree *Tree, currentDepth int) error {
 
 		builder.hasher.Reset()
 
-		b := make([]byte, len(left.HashBytes)+len(right.HashBytes))
-		copy(b[0:len(left.HashBytes)], left.HashBytes[:])
-		copy(b[len(left.HashBytes):len(b)], right.HashBytes[:])
+		b := make([]byte, len(left.Bytes())+len(right.Bytes()))
+		copy(b[0:len(left.Bytes())], left.Bytes()[:])
+		copy(b[len(left.Bytes()):len(b)], right.Bytes()[:])
 
 		if _, err := builder.hasher.Write(b); err != nil {
 			return err
