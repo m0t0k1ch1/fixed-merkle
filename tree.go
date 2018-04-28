@@ -124,3 +124,35 @@ func (tree *Tree) CreateMembershipProof(index int) ([]byte, error) {
 
 	return buf.Bytes(), nil
 }
+
+func (tree *Tree) VerifyMembershipProof(index int, proof []byte) (bool, error) {
+	conf := tree.config
+
+	if index < 0 || conf.allLeavesNum <= index {
+		return false, ErrLeafIndexOutOfRange
+	}
+
+	if len(proof) != conf.depth*conf.hashSize {
+		return false, nil
+	}
+
+	b := tree.levels[conf.depth][index].Bytes()
+	for i := 0; i < conf.depth; i++ {
+		sibling := proof[i*conf.hashSize : i*conf.hashSize+conf.hashSize]
+
+		conf.hasher.Reset()
+		if index%2 == 0 {
+			b = concBytes(b, sibling)
+		} else {
+			b = concBytes(sibling, b)
+		}
+		if _, err := conf.hasher.Write(b); err != nil {
+			return false, err
+		}
+		b = conf.hasher.Sum(nil)
+
+		index /= 2
+	}
+
+	return bytes.Equal(b, tree.Root().Bytes()), nil
+}
