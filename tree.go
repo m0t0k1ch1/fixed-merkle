@@ -97,6 +97,14 @@ func (tree *Tree) Root() *Node {
 	return tree.levels[0][0]
 }
 
+func (tree *Tree) Level(depth int) []*Node {
+	if depth < 0 || tree.config.depth < depth {
+		return nil
+	}
+
+	return tree.levels[depth]
+}
+
 func (tree *Tree) CreateMembershipProof(index int) ([]byte, error) {
 	conf := tree.config
 
