@@ -78,7 +78,7 @@ func (tree *Tree) build() error {
 			right := level[i+1]
 
 			tree.config.hasher.Reset()
-			b := concBytes(left.Bytes(), right.Bytes())
+			b := conc(left.Bytes(), right.Bytes())
 			if _, err := conf.hasher.Write(b); err != nil {
 				return err
 			}
@@ -142,9 +142,9 @@ func (tree *Tree) VerifyMembershipProof(index int, proof []byte) (bool, error) {
 
 		conf.hasher.Reset()
 		if index%2 == 0 {
-			b = concBytes(b, sibling)
+			b = conc(b, sibling)
 		} else {
-			b = concBytes(sibling, b)
+			b = conc(sibling, b)
 		}
 		if _, err := conf.hasher.Write(b); err != nil {
 			return false, err
