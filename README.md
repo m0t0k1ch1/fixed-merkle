@@ -1,5 +1,7 @@
 # fixed-merkle
 
+[![GoDoc](https://godoc.org/github.com/m0t0k1ch1/fixed-merkle?status.svg)](https://godoc.org/github.com/m0t0k1ch1/fixed-merkle)
+
 an implementation of fixed Merkle tree written in golang
 
 ``` sh
