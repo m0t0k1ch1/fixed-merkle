@@ -20,9 +20,9 @@ import (
 
 func main() {
 	conf, err := merkle.NewConfig(
-		sha256.New(),
-		2,  // depth
-		32, // leaf size (bytes)
+		sha256.New(), // hasher
+		2,            // depth
+		32,           // leaf size (bytes)
 	)
 	if err != nil {
 		panic(err)
