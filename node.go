@@ -24,6 +24,11 @@ func (node *Node) Hex() string {
 	return hex.EncodeToString(node.b)
 }
 
+// for fmt.Stringer interface
+func (node *Node) String() string {
+	return "0x" + node.Hex()
+}
+
 func (node *Node) Left() *Node {
 	return node.left
 }
