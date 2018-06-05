@@ -44,9 +44,9 @@ func NewConfig(hasher hash.Hash, depth int, hashSize int) (*Config, error) {
 
 	allLeavesNum := int(math.Exp2(float64(depth)))
 
-	nodesNum := 0
+	allNodesNum := 0
 	for i := allLeavesNum; i >= 1; i /= 2 {
-		nodesNum += i
+		allNodesNum += i
 	}
 
 	return &Config{
@@ -54,6 +54,6 @@ func NewConfig(hasher hash.Hash, depth int, hashSize int) (*Config, error) {
 		depth:        depth,
 		hashSize:     hashSize,
 		allLeavesNum: allLeavesNum,
-		allNodesNum:  nodesNum,
+		allNodesNum:  allNodesNum,
 	}, nil
 }
