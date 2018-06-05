@@ -16,7 +16,7 @@ func TestNewConfig(t *testing.T) {
 		config *Config
 		err    error
 	}
-	var newConfigTestCases = []struct {
+	testCases := []struct {
 		name string
 		in   input
 		out  output
@@ -53,7 +53,7 @@ func TestNewConfig(t *testing.T) {
 		},
 	}
 
-	for i, tc := range newConfigTestCases {
+	for i, tc := range testCases {
 		t.Logf("[%d] %s", i, tc.name)
 		in, out := tc.in, tc.out
 
