@@ -186,8 +186,7 @@ func TestMembershipProof(t *testing.T) {
 	}
 	type output struct {
 		proof []byte
-		err1  error
-		err2  error
+		err   error
 	}
 	testCases := []struct {
 		name string
@@ -211,18 +210,16 @@ func TestMembershipProof(t *testing.T) {
 					0x1f, 0x45, 0x78, 0x54, 0x72, 0x34, 0xdc, 0x08,
 				},
 				nil,
-				nil,
 			},
 		},
 		{
-			"failure: leaf index out of range",
+			"failure: leaf index out of range (creation)",
 			input{
 				4,
 			},
 			output{
 				nil,
 				ErrLeafIndexOutOfRange,
-				nil,
 			},
 		},
 	}
@@ -232,22 +229,28 @@ func TestMembershipProof(t *testing.T) {
 		in, out := tc.in, tc.out
 
 		proof, err := tree.CreateMembershipProof(in.index)
-		if err != out.err1 {
-			t.Errorf("expected: %v, actual: %v", out.err1, err)
+		if err != out.err {
+			t.Errorf("expected: %v, actual: %v", out.err, err)
 		}
 		if !bytes.Equal(proof, out.proof) {
 			t.Errorf("expected: %x, actual: %x", out.proof, proof)
 		}
 
-		for j := 0; j < tree.config.allLeavesNum; j++ {
-			ok, err := tree.VerifyMembershipProof(j, proof)
-			if err != out.err2 {
-				t.Errorf("expected: %v, actual: %v", out.err2, err)
-			}
-			if j == in.index && !ok {
-				t.Errorf("expected: %t, actual: %t", true, ok)
-			} else if j != in.index && ok {
-				t.Errorf("expected: %t, actual: %t", false, ok)
+		if len(proof) > 0 {
+			for j := 0; j <= tree.config.allLeavesNum; j++ {
+				ok, err := tree.VerifyMembershipProof(j, proof)
+				if err != nil {
+					if j < tree.config.allLeavesNum {
+						t.Fatal(err)
+					} else if err != ErrLeafIndexOutOfRange {
+						t.Fatal(err)
+					}
+				}
+				if j == in.index && !ok {
+					t.Errorf("expected: %t, actual: %t", true, ok)
+				} else if j != in.index && ok {
+					t.Errorf("expected: %t, actual: %t", false, ok)
+				}
 			}
 		}
 	}
