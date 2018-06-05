@@ -18,8 +18,8 @@ func TestNewConfig(t *testing.T) {
 		{sha256.New(), 16, 64, &Config{allLeavesNum: 65536, allNodesNum: 131071}, nil},
 		{sha256.New(), 0, 32, nil, ErrTooSmallDepth},
 		{sha256.New(), 17, 32, nil, ErrTooLargeDepth},
-		{sha256.New(), 1, 0, nil, ErrTooSmallHashSize},
-		{sha256.New(), 16, 65, nil, ErrTooLargeHashSize},
+		{sha256.New(), 8, 0, nil, ErrTooSmallHashSize},
+		{sha256.New(), 8, 65, nil, ErrTooLargeHashSize},
 	}
 
 	for _, tc := range newConfigTestCases {
