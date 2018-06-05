@@ -166,3 +166,89 @@ func TestNewTree(t *testing.T) {
 		}
 	}
 }
+
+func TestMembershipProof(t *testing.T) {
+	tree, err := NewTree(
+		testConfig,
+		[][]byte{
+			[]byte{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
+			[]byte{0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02},
+			[]byte{0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03},
+		},
+		false,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type input struct {
+		index int
+	}
+	type output struct {
+		proof []byte
+		err1  error
+		err2  error
+	}
+	testCases := []struct {
+		name string
+		in   input
+		out  output
+	}{
+		{
+			"success",
+			input{
+				0,
+			},
+			output{
+				[]byte{
+					0x10, 0xae, 0x0f, 0xdb, 0xf8, 0xc4, 0xf1, 0xf2,
+					0xb5, 0xe7, 0x08, 0xfd, 0x74, 0x78, 0xab, 0xd2,
+					0xbf, 0x03, 0xb1, 0x90, 0xed, 0xc8, 0x78, 0xdc,
+					0x62, 0xad, 0xa6, 0x45, 0xaa, 0x7e, 0x03, 0x10,
+					0xbf, 0x60, 0xc7, 0xd6, 0x82, 0x71, 0x68, 0x6d,
+					0xce, 0x02, 0x68, 0x7a, 0x48, 0x6e, 0xe4, 0xe3,
+					0x39, 0xb4, 0x2a, 0x6f, 0xef, 0x93, 0x9c, 0x07,
+					0x1f, 0x45, 0x78, 0x54, 0x72, 0x34, 0xdc, 0x08,
+				},
+				nil,
+				nil,
+			},
+		},
+		{
+			"failure: leaf index out of range",
+			input{
+				4,
+			},
+			output{
+				nil,
+				ErrLeafIndexOutOfRange,
+				nil,
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Logf("[%d] %s", i, tc.name)
+		in, out := tc.in, tc.out
+
+		proof, err := tree.CreateMembershipProof(in.index)
+		if err != out.err1 {
+			t.Errorf("expected: %v, actual: %v", out.err1, err)
+		}
+		if !bytes.Equal(proof, out.proof) {
+			t.Errorf("expected: %x, actual: %x", out.proof, proof)
+		}
+
+		for j := 0; j < tree.config.allLeavesNum; j++ {
+			ok, err := tree.VerifyMembershipProof(j, proof)
+			if err != out.err2 {
+				t.Errorf("expected: %v, actual: %v", out.err2, err)
+			}
+			if j == in.index && !ok {
+				t.Errorf("expected: %t, actual: %t", true, ok)
+			} else if j != in.index && ok {
+				t.Errorf("expected: %t, actual: %t", false, ok)
+			}
+		}
+	}
+}
