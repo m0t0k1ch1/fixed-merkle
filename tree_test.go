@@ -213,7 +213,7 @@ func TestMembershipProof(t *testing.T) {
 			},
 		},
 		{
-			"failure: leaf index out of range (creation)",
+			"failure: leaf index out of range",
 			input{
 				4,
 			},
