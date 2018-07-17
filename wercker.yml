@@ -42,7 +42,7 @@ build:
     - script:
         name: go test
         code: |
-          go test -v ./...
+          go test -race -coverprofile=coverage.txt -covermode=atomic -v ./...
 
     # Upload the report to Codecov
     - script:
