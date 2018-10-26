@@ -94,7 +94,7 @@ func (tree *Tree) build() error {
 }
 
 func (tree *Tree) Root() *Node {
-	return tree.levels[0][0]
+	return tree.Level(0)[0]
 }
 
 func (tree *Tree) Level(depth int) []*Node {
