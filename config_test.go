@@ -53,22 +53,23 @@ func TestNewConfig(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
-		t.Logf("[%d] %s", i, tc.name)
-		in, out := tc.in, tc.out
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			in, out := tc.in, tc.out
 
-		conf, err := NewConfig(in.hasher, in.depth, in.hashSize)
-		if err != out.err {
-			t.Errorf("expected: %v, actual: %v", out.err, err)
-		}
+			conf, err := NewConfig(in.hasher, in.depth, in.hashSize)
+			if err != out.err {
+				t.Errorf("expected: %v, actual: %v", out.err, err)
+			}
 
-		if conf != nil {
-			if conf.allLeavesNum != out.config.allLeavesNum {
-				t.Errorf("expected: %d, actual: %d", out.config.allLeavesNum, conf.allLeavesNum)
+			if conf != nil {
+				if conf.allLeavesNum != out.config.allLeavesNum {
+					t.Errorf("expected: %d, actual: %d", out.config.allLeavesNum, conf.allLeavesNum)
+				}
+				if conf.allNodesNum != out.config.allNodesNum {
+					t.Errorf("expected: %d, actual: %d", out.config.allNodesNum, conf.allNodesNum)
+				}
 			}
-			if conf.allNodesNum != out.config.allNodesNum {
-				t.Errorf("expected: %d, actual: %d", out.config.allNodesNum, conf.allNodesNum)
-			}
-		}
+		})
 	}
 }

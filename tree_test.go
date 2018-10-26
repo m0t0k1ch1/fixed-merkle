@@ -136,34 +136,35 @@ func TestNewTree(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
-		t.Logf("[%d] %s", i, tc.name)
-		in, out := tc.in, tc.out
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			in, out := tc.in, tc.out
 
-		tree, err := NewTree(in.config, in.leaves, in.hashed)
-		if err != out.err {
-			t.Errorf("expected: %v, actual: %v", out.err, err)
-		}
-
-		if err == nil {
-			rootActual := tree.Root()
-			rootExpected := out.root
-			if !bytes.Equal(rootActual.Bytes(), rootExpected.Bytes()) {
-				t.Errorf("expected: %x, actual: %x", rootExpected.Bytes(), rootActual.Bytes())
+			tree, err := NewTree(in.config, in.leaves, in.hashed)
+			if err != out.err {
+				t.Errorf("expected: %v, actual: %v", out.err, err)
 			}
 
-			leftActual := rootActual.Left()
-			leftExpected := rootExpected.Left()
-			if !bytes.Equal(leftActual.Bytes(), leftExpected.Bytes()) {
-				t.Errorf("expected: %x, actual: %x", leftExpected.Bytes(), leftActual.Bytes())
-			}
+			if err == nil {
+				rootActual := tree.Root()
+				rootExpected := out.root
+				if !bytes.Equal(rootActual.Bytes(), rootExpected.Bytes()) {
+					t.Errorf("expected: %x, actual: %x", rootExpected.Bytes(), rootActual.Bytes())
+				}
 
-			rightActual := rootActual.Right()
-			rightExpected := rootExpected.Right()
-			if !bytes.Equal(rightActual.Bytes(), rightExpected.Bytes()) {
-				t.Errorf("expected: %x, actual: %x", rightExpected.Bytes(), rightActual.Bytes())
+				leftActual := rootActual.Left()
+				leftExpected := rootExpected.Left()
+				if !bytes.Equal(leftActual.Bytes(), leftExpected.Bytes()) {
+					t.Errorf("expected: %x, actual: %x", leftExpected.Bytes(), leftActual.Bytes())
+				}
+
+				rightActual := rootActual.Right()
+				rightExpected := rootExpected.Right()
+				if !bytes.Equal(rightActual.Bytes(), rightExpected.Bytes()) {
+					t.Errorf("expected: %x, actual: %x", rightExpected.Bytes(), rightActual.Bytes())
+				}
 			}
-		}
+		})
 	}
 }
 
@@ -224,34 +225,35 @@ func TestMembershipProof(t *testing.T) {
 		},
 	}
 
-	for i, tc := range testCases {
-		t.Logf("[%d] %s", i, tc.name)
-		in, out := tc.in, tc.out
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			in, out := tc.in, tc.out
 
-		proof, err := tree.CreateMembershipProof(in.index)
-		if err != out.err {
-			t.Errorf("expected: %v, actual: %v", out.err, err)
-		}
-		if !bytes.Equal(proof, out.proof) {
-			t.Errorf("expected: %x, actual: %x", out.proof, proof)
-		}
+			proof, err := tree.CreateMembershipProof(in.index)
+			if err != out.err {
+				t.Errorf("expected: %v, actual: %v", out.err, err)
+			}
+			if !bytes.Equal(proof, out.proof) {
+				t.Errorf("expected: %x, actual: %x", out.proof, proof)
+			}
 
-		if len(proof) > 0 {
-			for j := 0; j <= tree.config.allLeavesNum; j++ {
-				ok, err := tree.VerifyMembershipProof(j, proof)
-				if err != nil {
-					if j < tree.config.allLeavesNum {
-						t.Fatal(err)
-					} else if err != ErrLeafIndexOutOfRange {
-						t.Fatal(err)
+			if len(proof) > 0 {
+				for j := 0; j <= tree.config.allLeavesNum; j++ {
+					ok, err := tree.VerifyMembershipProof(j, proof)
+					if err != nil {
+						if j < tree.config.allLeavesNum {
+							t.Fatal(err)
+						} else if err != ErrLeafIndexOutOfRange {
+							t.Fatal(err)
+						}
+					}
+					if j == in.index && !ok {
+						t.Errorf("expected: %t, actual: %t", true, ok)
+					} else if j != in.index && ok {
+						t.Errorf("expected: %t, actual: %t", false, ok)
 					}
 				}
-				if j == in.index && !ok {
-					t.Errorf("expected: %t, actual: %t", true, ok)
-				} else if j != in.index && ok {
-					t.Errorf("expected: %t, actual: %t", false, ok)
-				}
 			}
-		}
+		})
 	}
 }
