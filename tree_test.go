@@ -148,21 +148,10 @@ func TestNewTree(t *testing.T) {
 			if err == nil {
 				rootActual := tree.Root()
 				rootExpected := out.root
-				if !bytes.Equal(rootActual.Bytes(), rootExpected.Bytes()) {
-					t.Errorf("expected: %x, actual: %x", rootExpected.Bytes(), rootActual.Bytes())
-				}
 
-				leftActual := rootActual.Left()
-				leftExpected := rootExpected.Left()
-				if !bytes.Equal(leftActual.Bytes(), leftExpected.Bytes()) {
-					t.Errorf("expected: %x, actual: %x", leftExpected.Bytes(), leftActual.Bytes())
-				}
-
-				rightActual := rootActual.Right()
-				rightExpected := rootExpected.Right()
-				if !bytes.Equal(rightActual.Bytes(), rightExpected.Bytes()) {
-					t.Errorf("expected: %x, actual: %x", rightExpected.Bytes(), rightActual.Bytes())
-				}
+				testNodesEquality(t, rootExpected, rootActual)
+				testNodesEquality(t, rootExpected.Left(), rootActual.Left())
+				testNodesEquality(t, rootExpected.Right(), rootActual.Right())
 			}
 		})
 	}
