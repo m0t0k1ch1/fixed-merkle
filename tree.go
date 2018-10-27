@@ -16,26 +16,17 @@ type Tree struct {
 	levels [][]*Node
 }
 
-func NewTree(conf *Config, leaves [][]byte, hashed bool) (*Tree, error) {
+func NewTree(conf *Config, leaves [][]byte) (*Tree, error) {
 	if len(leaves) > conf.allLeavesNum {
 		return nil, ErrTooManyLeaves
-	}
-
-	if !hashed {
-		for i, leaf := range leaves {
-			conf.hasher.Reset()
-			if _, err := conf.hasher.Write(leaf); err != nil {
-				return nil, err
-			}
-			leaves[i] = conf.hasher.Sum(nil)
-		}
 	}
 
 	tree := &Tree{
 		config: conf,
 	}
-	tree.setUpBaseNodes(leaves)
-
+	if err := tree.buildBase(leaves); err != nil {
+		return nil, err
+	}
 	if err := tree.build(); err != nil {
 		return nil, err
 	}
@@ -43,7 +34,7 @@ func NewTree(conf *Config, leaves [][]byte, hashed bool) (*Tree, error) {
 	return tree, nil
 }
 
-func (tree *Tree) setUpBaseNodes(leaves [][]byte) {
+func (tree *Tree) buildBase(leaves [][]byte) error {
 	conf := tree.config
 	leavesNum := len(leaves)
 
@@ -52,16 +43,32 @@ func (tree *Tree) setUpBaseNodes(leaves [][]byte) {
 	tree.levels[conf.depth] = make([]*Node, conf.allLeavesNum)
 
 	for i := 0; i < leavesNum; i++ {
-		node := newNode(leaves[i], nil, nil)
+		conf.hasher.Reset()
+		if _, err := conf.hasher.Write(leaves[i]); err != nil {
+			return err
+		}
+		leafHash := conf.hasher.Sum(nil)
+
+		node := newNode(leafHash, nil, nil)
 		tree.nodes[i] = node
 		tree.levels[conf.depth][i] = node
 	}
 
+	emptyLeaf := make([]byte, conf.hashSize, conf.hashSize)
+
+	conf.hasher.Reset()
+	if _, err := conf.hasher.Write(emptyLeaf); err != nil {
+		return err
+	}
+	emptyLeafHash := conf.hasher.Sum(nil)
+
 	for i := leavesNum; i < conf.allLeavesNum; i++ {
-		node := newNode(make([]byte, conf.hashSize, conf.hashSize), nil, nil)
+		node := newNode(emptyLeafHash, nil, nil)
 		tree.nodes[i] = node
 		tree.levels[conf.depth][i] = node
 	}
+
+	return nil
 }
 
 func (tree *Tree) build() error {
