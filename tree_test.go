@@ -114,7 +114,7 @@ func TestMembershipProof(t *testing.T) {
 	}
 
 	type input struct {
-		index int
+		index uint64
 	}
 	type output struct {
 		proof []byte
@@ -169,7 +169,7 @@ func TestMembershipProof(t *testing.T) {
 			}
 
 			if len(proof) > 0 {
-				for j := 0; j <= tree.config.allLeavesNum; j++ {
+				for j := uint64(0); j <= tree.config.allLeavesNum; j++ {
 					ok, err := tree.VerifyMembershipProof(j, proof)
 					if err != nil {
 						if j < tree.config.allLeavesNum {

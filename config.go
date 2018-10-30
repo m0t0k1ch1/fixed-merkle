@@ -22,13 +22,13 @@ var (
 
 type Config struct {
 	hasher       hash.Hash
-	depth        int
-	hashSize     int
-	allLeavesNum int
-	allNodesNum  int
+	depth        uint64
+	hashSize     uint64
+	allLeavesNum uint64
+	allNodesNum  uint64
 }
 
-func NewConfig(hasher hash.Hash, depth int, hashSize int) (*Config, error) {
+func NewConfig(hasher hash.Hash, depth, hashSize uint64) (*Config, error) {
 	if depth < DepthMin {
 		return nil, ErrTooSmallDepth
 	}
@@ -42,9 +42,9 @@ func NewConfig(hasher hash.Hash, depth int, hashSize int) (*Config, error) {
 		return nil, ErrTooLargeHashSize
 	}
 
-	allLeavesNum := int(math.Exp2(float64(depth)))
+	allLeavesNum := uint64(math.Exp2(float64(depth)))
 
-	allNodesNum := 0
+	allNodesNum := uint64(0)
 	for i := allLeavesNum; i >= 1; i /= 2 {
 		allNodesNum += i
 	}

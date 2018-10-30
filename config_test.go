@@ -9,8 +9,8 @@ import (
 func TestNewConfig(t *testing.T) {
 	type input struct {
 		hasher   hash.Hash
-		depth    int
-		hashSize int
+		depth    uint64
+		hashSize uint64
 	}
 	type output struct {
 		config *Config

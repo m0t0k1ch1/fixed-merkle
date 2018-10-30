@@ -17,7 +17,7 @@ type Tree struct {
 }
 
 func NewTree(conf *Config, leaves [][]byte) (*Tree, error) {
-	if len(leaves) > conf.allLeavesNum {
+	if uint64(len(leaves)) > conf.allLeavesNum {
 		return nil, ErrTooManyLeaves
 	}
 
@@ -62,7 +62,7 @@ func (tree *Tree) buildBase(leaves [][]byte) error {
 	}
 	emptyLeafHash := conf.hasher.Sum(nil)
 
-	for i := leavesNum; i < conf.allLeavesNum; i++ {
+	for i := uint64(leavesNum); i < conf.allLeavesNum; i++ {
 		node := newNode(emptyLeafHash, nil, nil)
 		tree.nodes[i] = node
 		tree.levels[conf.depth][i] = node
@@ -104,25 +104,25 @@ func (tree *Tree) Root() *Node {
 	return tree.Level(0)[0]
 }
 
-func (tree *Tree) Level(depth int) []*Node {
-	if depth < 0 || tree.config.depth < depth {
+func (tree *Tree) Level(depth uint64) []*Node {
+	if tree.config.depth < depth {
 		return nil
 	}
 
 	return tree.levels[depth]
 }
 
-func (tree *Tree) CreateMembershipProof(index int) ([]byte, error) {
+func (tree *Tree) CreateMembershipProof(index uint64) ([]byte, error) {
 	conf := tree.config
 
-	if index < 0 || conf.allLeavesNum <= index {
+	if conf.allLeavesNum <= index {
 		return nil, ErrLeafIndexOutOfRange
 	}
 
 	buf := bytes.NewBuffer(nil)
 
 	for d := conf.depth; d > 0; d-- {
-		var siblingIndex int
+		var siblingIndex uint64
 		if index%2 == 0 {
 			siblingIndex = index + 1
 		} else {
@@ -140,19 +140,19 @@ func (tree *Tree) CreateMembershipProof(index int) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (tree *Tree) VerifyMembershipProof(index int, proof []byte) (bool, error) {
+func (tree *Tree) VerifyMembershipProof(index uint64, proof []byte) (bool, error) {
 	conf := tree.config
 
-	if index < 0 || conf.allLeavesNum <= index {
+	if conf.allLeavesNum <= index {
 		return false, ErrLeafIndexOutOfRange
 	}
 
-	if len(proof) != conf.depth*conf.hashSize {
+	if uint64(len(proof)) != conf.depth*conf.hashSize {
 		return false, nil
 	}
 
 	b := tree.levels[conf.depth][index].Bytes()
-	for i := 0; i < conf.depth; i++ {
+	for i := uint64(0); i < conf.depth; i++ {
 		sibling := proof[i*conf.hashSize : i*conf.hashSize+conf.hashSize]
 
 		conf.hasher.Reset()
