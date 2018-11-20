@@ -8,7 +8,7 @@ import (
 
 const (
 	DepthMin    = 1
-	DepthMax    = 16
+	DepthMax    = 32
 	HashSizeMin = 1  // bytes
 	HashSizeMax = 64 // bytes
 )

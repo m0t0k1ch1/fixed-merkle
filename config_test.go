@@ -38,7 +38,7 @@ func TestNewConfig(t *testing.T) {
 		},
 		{
 			"failure: too large depth",
-			input{sha256.New(), 17, 32},
+			input{sha256.New(), 33, 32},
 			output{nil, ErrTooLargeDepth},
 		},
 		{
